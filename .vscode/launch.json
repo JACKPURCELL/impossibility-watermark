@@ -1,0 +1,18 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: 当前文件",
+            "type": "python",
+            "request": "launch",
+            "program": "attack.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["--query", "Why is every book I hear about a \" NY Times # 1 Best Seller \" ? ELI5 : Why is every book I hear about a \" NY Times # 1 Best Seller \" ? Should n't there only be one \" # 1 \" best seller ? Please explain like I'm five.", 
+            "--response", "Well hello there, little friend! *adjusts glasses* Let me tell you a secret about books and their popularity. *winks*. So, you know how there are lots of different books out there, right? Like, a gazillion! *estimates* And some of them are really popular and get talked about a lot. *nods*\n\nWell, the New York Times (NYT) is a big deal in the"]
+    }
+    ]
+}

@@ -39,15 +39,15 @@ class Attacker:
         elif self.args.half:
             half_kwargs = dict(torch_dtype=torch.bfloat16)
         print(f'Loading mask filling model {self.args.mask_filling_model_name}...')
-        mask_model = transformers.AutoModelForSeq2SeqLM.from_pretrained(self.args.mask_filling_model_name, **int8_kwargs, **half_kwargs, cache_dir=self.args.cache_dir)
+        mask_model = transformers.AutoModelForSeq2SeqLM.from_pretrained(self.args.mask_filling_model_name, **int8_kwargs, **half_kwargs)
         try:
             self.n_positions = self.mask_model.config.n_positions
         except AttributeError:
             self.n_positions = 512
         print('MOVING MASK MODEL TO GPU...', end='', flush=True)
         start = time.time()
-        if not self.args.random_fills and not self.args.int8:
-            mask_model.to(self.device)
+        # if not self.args.random_fills and not self.args.int8:
+        mask_model.to(self.device)
         print(f'DONE ({time.time() - start:.2f}s)')
         return mask_model
     
@@ -307,11 +307,13 @@ def main(query, response=None):
         print(f"Query: {query}")
         trainer = Trainer(data, oracle, args)
         result_dict = trainer.random_walk_attack(oracle, attacker)
+        #Final output
         paraphrased_response = result_dict["paraphrased_response"]
         print(f"Response: {response}")
         print(f"Paraphrased Response: {paraphrased_response}")
         result_dict["watermarked_response"] = datum["output_with_watermark"]
         result_dict["query"] = query
+    
         attack_results.append(result_dict)
         
         # Saved intermediate results

@@ -1,5 +1,5 @@
 import json
-import openai
+# import openai
 import os
 from dotenv import load_dotenv
 import numpy as np
@@ -10,14 +10,20 @@ import jsonlines
 import re
 import copy
 import transformers
-
+import torch
 DEF_MODEL = "gpt-4"
 MODELS = {"gpt-4": "gpt-4", "gpt-3.5": "gpt-3.5-turbo"}
 TOKENIZERS  = {model : tiktoken.encoding_for_model(MODELS[model]) for model in MODELS }
 load_dotenv(dotenv_path='./.env') # take environment variables from .env with OPENAI_API_TOKEN=<your_key_here>
-if os.getenv("OPENAI_API_ENDPOINT"):
-    openai.api_base = os.getenv("OPENAI_API_ENDPOINT")
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# if os.getenv("OPENAI_API_ENDPOINT"):
+#     openai.api_base = os.getenv("OPENAI_API_ENDPOINT")
+# openai.api_key = os.getenv("OPENAI_API_KEY")
+from openai import OpenAI
+client = OpenAI(
+    # This is the default and can be omitted
+    # api_key="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",
+    api_key=os.environ.get("OPENAI_API_KEY")
+)
 
 def set_seed(seed):
    random.seed(seed)
@@ -112,7 +118,9 @@ def chat(message, history = [{"role": "system", "content": "You are a research a
             presence_penalty=0,
             )
       params.update(extra_params) # update based on any extra parameters to add
-      response = openai.ChatCompletion.create(**params)
+    #   response = openai.ChatCompletion.create(**params)
+      response = client.chat.completions.create(**params )
+      
       break
     except Exception as e:
       print(f"Error!:\n{e}")
@@ -125,7 +133,7 @@ def chat(message, history = [{"role": "system", "content": "You are a research a
       else:
         return None
 
-  text_response =  response.choices[0]['message']['content']
+  text_response =  response.choices[0].message.content
   if debug: print(f"Response:\n {chopped(text_response)} ({count_tokens(text_response, tokenizer)} tokens)", flush=True)
   if return_more:
     return text_response, history + [{"role": "assistant", "content": text_response}], response
@@ -176,7 +184,7 @@ def load_data(jsonl_file='data/lfqa/lfqa_umd.jsonl'):
     return data
 
 class Oracle:
-    def __init__(self, query, response, check_quality=False, choice_granuality=5, use_chat_arena_prompt=False, cache_dir='~/.cache') -> None:
+    def __init__(self, query, response, check_quality=False, choice_granuality=5, use_chat_arena_prompt=False, cache_dir='/data/jc/hf/hub') -> None:
         self.init_score = -1
         self.query = query
         self.response = response
